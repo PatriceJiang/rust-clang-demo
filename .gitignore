@@ -7,3 +7,5 @@
 
 res/
 cmake_project/
+
+.vscode
