@@ -1,0 +1,9 @@
+[package]
+name = "rust-clang"
+version = "0.1.0"
+authors = ["Arnold <397136899@qq.com>"]
+edition = "2018"
+
+[dependencies]
+
+clang = "*"
