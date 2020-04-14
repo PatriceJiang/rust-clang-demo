@@ -9,7 +9,12 @@ use std::env;
 
 fn process_tree(entity:&Entity, file_name: &str) {
     match entity.get_kind() {
-        EntityKind::ClassDecl => { process_class(entity, file_name) ;} ,
+        EntityKind::ClassDecl => { 
+            process_class(entity, file_name);
+        } ,
+        EntityKind::StructDecl => {
+            process_struct(entity, file_name);
+        },
         EntityKind::Namespace => {
             for c in entity.get_children() {
                 process_tree(&c, file_name);
@@ -50,6 +55,18 @@ fn process_class(entity:&Entity, file_name: &str) {
     }
 }
 
+fn process_struct(entity: &Entity, file_name: &str ){
+
+    for  c in entity.get_children() {
+        match c.get_kind() {
+            EntityKind::FieldDecl => {
+                c.get_display_name();
+            },
+            _ => {}
+        }
+    }
+}
+
 fn process_file<P: AsRef<Path>, A: AsRef<str> >(path : P, index : &Index, args:&Vec<A> ) {
 
     println!("--- Processing path `{}`", path.as_ref().display());
@@ -60,7 +77,8 @@ fn process_file<P: AsRef<Path>, A: AsRef<str> >(path : P, index : &Index, args:&
     let parse_result = parser.parse();
 
     if parse_result.is_err() {
-        println!("Error: {:?}", parse_result.err().unwrap());
+        let err = parse_result.err().unwrap();
+        println!("process_file: Error: {}",err);
         return
     }
 
@@ -114,11 +132,24 @@ fn main() {
 
     let mut args = env::args().collect::<Vec<String>>();
 
-    args[0] = "-xc++".to_owned();
-    args.push("-I/home/jiang/Github/cocos2d-x/cocos".to_owned());
-    args.push("-I/home/jiang/Github/cocos2d-x/external/linux-specific/fmod/include".to_owned());
-    args.push("-I/home/jiang/Github/cocos2d-x/external/glfw3/include/linux".to_owned());
-    args.push("-DLINUX".to_owned());
+    //args.push("-xc++".to_owned());
+    args.push("-xc++-header".to_owned());
+    args.push("-v".to_owned());
+    //args.push("-I/home/jiang/Github/cocos2d-x/cocos".to_owned());
+    //args.push("-I/home/jiang/Github/cocos2d-x/external/linux-specific/fmod/include".to_owned());
+    //args.push("-I/home/jiang/Github/cocos2d-x/external/glfw3/include/linux".to_owned());
+    //args.push("-DLINUX".to_owned());
+
+    args.push("-I/Users/pt/Github/cocos2d-x-lite/cocos".to_owned());
+    args.push("-I/Users/pt/Github/cocos2d-x-lite/external/mac/include".to_owned());
+    args.push("-I/Users/pt/Github/cocos2d-x-lite/cocos/renderer".to_owned());
+
+
+    args.push("-I/usr/local/include".to_owned());
+    args.push("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include".to_owned());
+    args.push("/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.3/include".to_owned());
+
+    args.push("-std=c++14".to_owned());
 
     println!("args {:?}", args);
 
@@ -132,7 +163,8 @@ fn main() {
     // let dst2 = Path::new("/home/jiang/Github/cocos2d-x/cocos/scripting/lua-bindings/manual");
     // process_path(dst2, &index);
 
-    let dst2 = Path::new("/home/jiang/Github/cocos2d-x/cocos/cocos2d.h");
+    //let dst2 = Path::new("/home/jiang/Github/cocos2d-x/cocos/cocos2d.h");
+    let dst2 = Path::new("/Users/pt/Github/cocos2d-x-lite/cocos/renderer/core/CoreDef.h");
     process_path(dst2, &index, &args);
 
 }
